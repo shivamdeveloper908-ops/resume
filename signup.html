@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeLens — Create Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+html, body { height: 100%; overflow: hidden; }
+body { display: flex; align-items: stretch; height: 100dvh; width: 100vw; }
+@media (max-width: 768px), (max-height: 500px) and (orientation: landscape) {
+  body { overflow: auto; height: auto; }
+  .auth-card { min-height: auto !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-bg-plate" role="img" aria-label="Looking up between golden glass skyscrapers at sunset"></div>
+<video id="bg-video" class="auth-bg-video"
+  src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/197f7e27-faac-4bdc-916c-615ac962bf86.mp4"
+  autoplay muted loop playsinline aria-hidden="true"></video>
+<div class="auth-shade-left"  aria-hidden="true"></div>
+<div class="auth-shade-top"   aria-hidden="true"></div>
+<div class="auth-shade-bottom"aria-hidden="true"></div>
+
+<div class="auth-page">
+
+  <!-- ── Hero (left) ── -->
+  <section class="auth-hero" aria-label="ResumeLens hero">
+    <div class="auth-top-bar">
+      <a href="index.html" class="logo" aria-label="ResumeLens home">
+        <span class="logo-tile" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="gSIGNUP" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFC233"/>
+      <stop offset="100%" stop-color="#F58A07"/>
+    </linearGradient>
+  </defs>
+  <!-- R: vertical bar + top bump + diagonal leg -->
+  <rect x="7" y="7" width="3.5" height="18" rx="1.2" fill="url(#gSIGNUP)"/>
+  <path d="M10.5 7h5a4 4 0 0 1 0 8h-5V7z" fill="url(#gSIGNUP)"/>
+  <path d="M13.5 15l5.5 10h-4l-5-10z" fill="url(#gSIGNUP)"/>
+  <!-- L: vertical bar + bottom shelf -->
+  <rect x="21" y="7" width="3.5" height="18" rx="1.2" fill="url(#gSIGNUP)" opacity=".72"/>
+  <rect x="21" y="21.5" width="8" height="3.5" rx="1.2" fill="url(#gSIGNUP)" opacity=".72"/>
+</svg></span>
+        <span class="logo-wordmark">ResumeLens</span>
+      </a>
+      <a href="index.html" class="back-link">Back to Login</a>
+    </div>
+    <div class="auth-pitch">
+      <h1 class="auth-headline">
+        <span class="auth-headline-line"><span class="auth-headline-line-inner">Your Resume.</span></span>
+        <span class="auth-headline-line"><span class="auth-headline-line-inner">Perfectly Matched.</span></span>
+      </h1>
+      <p class="auth-subline">
+        Create a free account and start analyzing<br>
+        your resume against any job description in seconds.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Card (right) ── -->
+  <aside class="auth-card-panel" aria-label="Sign-up panel">
+    <div class="auth-card">
+      <div class="auth-form-wrap">
+
+        <h2 class="card-heading">Create Account</h2>
+        <p class="card-sub">Join ResumeLens and start landing more interviews.</p>
+
+        <div id="signup-error" style="display:none;margin-top:16px;padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;font-size:14px;color:#991B1B;" role="alert"></div>
+
+        <form class="field-group" id="signup-form" novalidate>
+
+          <div class="field">
+            <label for="name">Full Name</label>
+            <div class="field-input-wrap">
+              <input id="name" type="text" name="name"
+                placeholder="Your full name" autocomplete="name" required aria-required="true">
+            </div>
+            <span class="field-error" id="name-err">Please enter your full name.</span>
+          </div>
+
+          <div class="field">
+            <label for="email">Email Address</label>
+            <div class="field-input-wrap">
+              <input id="email" type="email" name="email"
+                placeholder="Input your email" autocomplete="email" required aria-required="true">
+            </div>
+            <span class="field-error" id="email-err">Please enter a valid email address.</span>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="field-input-wrap">
+              <input id="password" type="password" name="password"
+                placeholder="Create a password (min 8 chars)"
+                autocomplete="new-password" required aria-required="true" class="has-eye">
+              <button type="button" class="eye-btn" id="eye-pw"
+                aria-label="Show password" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle class="eye-open" cx="12" cy="12" r="3"/>
+                  <line class="eye-slash" x1="3" y1="3" x2="21" y2="21"/>
+                </svg>
+              </button>
+            </div>
+            <span class="field-error" id="pw-err">Password must be at least 8 characters.</span>
+          </div>
+
+          <div class="field">
+            <label for="confirm-password">Confirm Password</label>
+            <div class="field-input-wrap">
+              <input id="confirm-password" type="password" name="confirm-password"
+                placeholder="Repeat your password"
+                autocomplete="new-password" required aria-required="true" class="has-eye">
+              <button type="button" class="eye-btn" id="eye-cpw"
+                aria-label="Show confirm password" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle class="eye-open" cx="12" cy="12" r="3"/>
+                  <line class="eye-slash" x1="3" y1="3" x2="21" y2="21"/>
+                </svg>
+              </button>
+            </div>
+            <span class="field-error" id="cpw-err">Passwords do not match.</span>
+          </div>
+
+          <!-- Course selector -->
+          <div class="field">
+            <label for="course">Your Field / Course</label>
+            <div class="field-input-wrap">
+              <select id="course" name="course" style="width:100%;height:calc(var(--u)*66);border-radius:calc(var(--u)*10);border:calc(var(--u)*1) solid var(--line1);background:#fff;font-family:inherit;font-size:calc(var(--u)*16);color:var(--ink);padding:0 calc(var(--u)*18);outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23898D94' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right calc(var(--u)*16) center;padding-right:calc(var(--u)*44);transition:border-color .2s;" aria-required="true">
+                <option value="" disabled selected>Select your field…</option>
+                <optgroup label="Business & Management">
+                  <option value="mba">MBA — Business Administration</option>
+                  <option value="marketing">Marketing & Digital Marketing</option>
+                  <option value="finance">Finance & Accounting</option>
+                  <option value="hr">Human Resources (HR)</option>
+                  <option value="management">General Management</option>
+                </optgroup>
+                <optgroup label="Engineering & Technology">
+                  <option value="software">Software Engineering / CS</option>
+                  <option value="data_science">Data Science & AI/ML</option>
+                  <option value="devops">DevOps / Cloud Engineering</option>
+                  <option value="mechanical">Mechanical Engineering</option>
+                  <option value="electrical">Electrical Engineering</option>
+                  <option value="civil">Civil Engineering</option>
+                </optgroup>
+                <optgroup label="Healthcare & Sciences">
+                  <option value="medical">Medical / MBBS / Healthcare</option>
+                  <option value="nursing">Nursing</option>
+                  <option value="pharmacy">Pharmacy</option>
+                  <option value="biology">Biology / Life Sciences</option>
+                </optgroup>
+                <optgroup label="Design & Creative">
+                  <option value="design">UI/UX & Graphic Design</option>
+                  <option value="media">Media, Film & Journalism</option>
+                  <option value="architecture">Architecture</option>
+                </optgroup>
+                <optgroup label="Law & Social Sciences">
+                  <option value="law">Law / LLB / LLM</option>
+                  <option value="psychology">Psychology</option>
+                  <option value="education">Education / Teaching</option>
+                  <option value="social_work">Social Work</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value="other">Other / Not Listed</option>
+                </optgroup>
+              </select>
+            </div>
+            <span class="field-error" id="course-err">Please select your field or course.</span>
+          </div>
+
+          <!-- Terms -->
+          <div class="options-row" style="margin-top:4px">
+            <label class="remember" style="align-items:flex-start">
+              <input type="checkbox" id="terms" name="terms" required style="margin-top:2px">
+              <span class="remember-label" style="line-height:1.4">
+                I agree to the <a href="#" style="color:var(--amber);font-weight:600;text-decoration:none" onclick="return false">Terms of Service</a>
+                and <a href="#" style="color:var(--amber);font-weight:600;text-decoration:none" onclick="return false">Privacy Policy</a>
+              </span>
+            </label>
+          </div>
+          <span class="field-error" id="terms-err" style="display:none">You must accept the terms to continue.</span>
+
+          <button type="submit" class="primary-btn" id="signup-btn" style="margin-top:calc(var(--u)*24)">
+            <span id="signup-btn-label">Create Account</span>
+            <span id="signup-spinner" class="spinner" style="display:none"></span>
+          </button>
+
+        </form>
+
+        <div class="divider">Or sign up with:</div>
+
+        <button type="button" class="google-btn" id="google-btn" aria-label="Continue with Google">
+          <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        <p class="card-footer">Already have an account? <a href="index.html">Log in here</a></p>
+
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  Auth.requireGuest();
+  initAuthVideo('bg-video');
+  initEyeToggle('eye-pw',  'password');
+  initEyeToggle('eye-cpw', 'confirm-password');
+
+  const form      = document.getElementById('signup-form');
+  const errBanner = document.getElementById('signup-error');
+  const signupBtn = document.getElementById('signup-btn');
+  const btnLabel  = document.getElementById('signup-btn-label');
+  const spinner   = document.getElementById('signup-spinner');
+
+  function showErr(msg) { errBanner.textContent = msg; errBanner.style.display = 'block'; }
+  function hideErr()    { errBanner.style.display = 'none'; }
+  function setLoading(on) {
+    signupBtn.disabled = on;
+    btnLabel.style.display = on ? 'none' : '';
+    spinner.style.display  = on ? '' : 'none';
+  }
+  function fieldErr(id, msg, show) {
+    const el = document.getElementById(id);
+    if (msg) el.textContent = msg;
+    el.classList.toggle('visible', show);
+    el.style.display = show ? 'block' : '';
+  }
+  function markInput(id, error) {
+    document.getElementById(id).classList.toggle('error', error);
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    hideErr();
+    let valid = true;
+
+    const name     = document.getElementById('name').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const pw       = document.getElementById('password').value;
+    const cpw      = document.getElementById('confirm-password').value;
+    const course   = document.getElementById('course').value;
+    const terms    = document.getElementById('terms').checked;
+
+    if (!name) { fieldErr('name-err', 'Please enter your full name.', true); markInput('name', true); valid = false; }
+    else       { fieldErr('name-err', '', false); markInput('name', false); }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { fieldErr('email-err', 'Please enter a valid email address.', true); markInput('email', true); valid = false; }
+    else { fieldErr('email-err', '', false); markInput('email', false); }
+
+    if (pw.length < 8) { fieldErr('pw-err', 'Password must be at least 8 characters.', true); markInput('password', true); valid = false; }
+    else { fieldErr('pw-err', '', false); markInput('password', false); }
+
+    if (pw !== cpw) { fieldErr('cpw-err', 'Passwords do not match.', true); markInput('confirm-password', true); valid = false; }
+    else { fieldErr('cpw-err', '', false); markInput('confirm-password', false); }
+
+    if (!course) { fieldErr('course-err', 'Please select your field or course.', true); document.getElementById('course').style.borderColor='#ef4444'; valid = false; }
+    else { document.getElementById('course-err').classList.remove('visible'); document.getElementById('course').style.borderColor=''; }
+    if (!terms) { fieldErr('terms-err', 'You must accept the terms to continue.', true); document.getElementById('terms-err').style.display='block'; valid = false; }
+    else { document.getElementById('terms-err').style.display = 'none'; }
+
+    if (!valid) return;
+    setLoading(true);
+
+    await new Promise(r => setTimeout(r, 700));
+
+    const result = Auth.register({ name, email, password: pw, course });
+    if (result.ok) {
+      Auth.login({ email, password: pw, remember: false });
+      window.location.href = 'dashboard.html';
+    } else {
+      setLoading(false);
+      showErr(result.error);
+    }
+  });
+
+  document.getElementById('google-btn').addEventListener('click', () => {
+    showToast('Google Sign-In requires OAuth configuration. Use email/password for this demo.', 'warn', 4000);
+  });
+</script>
+</body>
+</html>

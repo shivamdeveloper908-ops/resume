@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeLens — Log In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+html, body { height: 100%; overflow: hidden; }
+body { display: flex; align-items: stretch; height: 100dvh; width: 100vw; }
+</style>
+</head>
+<body>
+
+<div class="auth-bg-plate" role="img" aria-label="Looking up between golden glass skyscrapers at sunset"></div>
+<video id="bg-video" class="auth-bg-video"
+  src="https://d2ol7oe51mr4n9.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/197f7e27-faac-4bdc-916c-615ac962bf86.mp4"
+  autoplay muted loop playsinline aria-hidden="true"></video>
+<div class="auth-shade-left"  aria-hidden="true"></div>
+<div class="auth-shade-top"   aria-hidden="true"></div>
+<div class="auth-shade-bottom"aria-hidden="true"></div>
+
+<div class="auth-page">
+
+  <!-- ── Hero (left) ── -->
+  <section class="auth-hero" aria-label="ResumeLens hero">
+    <div class="auth-top-bar">
+      <a href="index.html" class="logo" aria-label="ResumeLens home">
+        <span class="logo-tile" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="gLOGIN" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFC233"/>
+      <stop offset="100%" stop-color="#F58A07"/>
+    </linearGradient>
+  </defs>
+  <!-- R: vertical bar + top bump + diagonal leg -->
+  <rect x="7" y="7" width="3.5" height="18" rx="1.2" fill="url(#gLOGIN)"/>
+  <path d="M10.5 7h5a4 4 0 0 1 0 8h-5V7z" fill="url(#gLOGIN)"/>
+  <path d="M13.5 15l5.5 10h-4l-5-10z" fill="url(#gLOGIN)"/>
+  <!-- L: vertical bar + bottom shelf -->
+  <rect x="21" y="7" width="3.5" height="18" rx="1.2" fill="url(#gLOGIN)" opacity=".72"/>
+  <rect x="21" y="21.5" width="8" height="3.5" rx="1.2" fill="url(#gLOGIN)" opacity=".72"/>
+</svg></span>
+        <span class="logo-wordmark">ResumeLens</span>
+      </a>
+      <a href="dashboard.html" class="back-link">Back to App</a>
+    </div>
+    <div class="auth-pitch">
+      <h1 class="auth-headline">
+        <span class="auth-headline-line"><span class="auth-headline-line-inner">Match Smarter.</span></span>
+        <span class="auth-headline-line"><span class="auth-headline-line-inner">Land Faster.</span></span>
+      </h1>
+      <p class="auth-subline">
+        AI-powered resume analysis that shows exactly<br>
+        how well your resume fits any job description.
+      </p>
+    </div>
+  </section>
+
+  <!-- ── Card (right) ── -->
+  <aside class="auth-card-panel" aria-label="Log-in panel">
+    <div class="auth-card">
+      <div class="auth-form-wrap">
+
+        <h2 class="card-heading">Welcome Back!</h2>
+        <p class="card-sub">Log in to analyze your resume and land your next role.</p>
+
+        <!-- Global error banner -->
+        <div id="login-error" style="display:none;margin-top:16px;padding:12px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;font-size:14px;color:#991B1B;" role="alert"></div>
+
+        <form class="field-group" id="login-form" novalidate>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <div class="field-input-wrap">
+              <input id="email" type="email" name="email"
+                placeholder="Input your email" autocomplete="email" required aria-required="true">
+            </div>
+            <span class="field-error" id="email-err">Please enter a valid email address.</span>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="field-input-wrap">
+              <input id="password" type="password" name="password"
+                placeholder="Input your password" autocomplete="current-password"
+                required aria-required="true" class="has-eye">
+              <button type="button" class="eye-btn" id="eye-toggle"
+                aria-label="Show password" aria-pressed="false">
+                <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle class="eye-open" cx="12" cy="12" r="3"/>
+                  <line class="eye-slash" x1="3" y1="3" x2="21" y2="21"/>
+                </svg>
+              </button>
+            </div>
+            <span class="field-error" id="pw-err">Please enter your password.</span>
+          </div>
+
+          <div class="options-row">
+            <label class="remember">
+              <input type="checkbox" id="remember-me" name="remember">
+              <span class="remember-label">Remember Me</span>
+            </label>
+            <a href="#" class="forgot-link" id="forgot-link">Forgot Password?</a>
+          </div>
+
+          <button type="submit" class="primary-btn" id="login-btn" style="margin-top:calc(var(--u)*38)">
+            <span id="login-btn-label">Login</span>
+            <span id="login-spinner" class="spinner" style="display:none"></span>
+          </button>
+
+        </form>
+
+        <div class="divider">Or continue with:</div>
+
+        <button type="button" class="google-btn" id="google-btn" aria-label="Continue with Google">
+          <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Continue with Google
+        </button>
+
+        <p class="card-footer">Don't have an account? <a href="signup.html">Sign up here</a></p>
+
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  // Redirect if already logged in
+  Auth.requireGuest();
+
+  initAuthVideo('bg-video');
+  initEyeToggle('eye-toggle', 'password');
+
+  const form      = document.getElementById('login-form');
+  const emailIn   = document.getElementById('email');
+  const pwIn      = document.getElementById('password');
+  const errBanner = document.getElementById('login-error');
+  const loginBtn  = document.getElementById('login-btn');
+  const btnLabel  = document.getElementById('login-btn-label');
+  const spinner   = document.getElementById('login-spinner');
+
+  function showErr(msg) {
+    errBanner.textContent = msg;
+    errBanner.style.display = 'block';
+  }
+  function hideErr() { errBanner.style.display = 'none'; }
+
+  function setLoading(on) {
+    loginBtn.disabled = on;
+    btnLabel.style.display = on ? 'none' : '';
+    spinner.style.display  = on ? '' : 'none';
+  }
+
+  function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    hideErr();
+    let valid = true;
+
+    if (!validateEmail(emailIn.value)) {
+      document.getElementById('email-err').classList.add('visible');
+      emailIn.classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('email-err').classList.remove('visible');
+      emailIn.classList.remove('error');
+    }
+
+    if (!pwIn.value) {
+      document.getElementById('pw-err').classList.add('visible');
+      pwIn.classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('pw-err').classList.remove('visible');
+      pwIn.classList.remove('error');
+    }
+
+    if (!valid) return;
+    setLoading(true);
+
+    // Small delay for UX feel
+    await new Promise(r => setTimeout(r, 600));
+
+    const result = Auth.login({
+      email: emailIn.value.trim(),
+      password: pwIn.value,
+      remember: document.getElementById('remember-me').checked
+    });
+
+    if (result.ok) {
+      window.location.href = 'dashboard.html';
+    } else {
+      setLoading(false);
+      showErr(result.error);
+    }
+  });
+
+  // Google btn: demo sign-in with a demo account
+  document.getElementById('google-btn').addEventListener('click', () => {
+    showToast('Google Sign-In requires OAuth configuration. Use email/password for this demo.', 'warn', 4000);
+  });
+
+  document.getElementById('forgot-link').addEventListener('click', e => {
+    e.preventDefault();
+    showToast('Password reset: check the email you registered with, or create a new account.', '', 4500);
+  });
+</script>
+</body>
+</html>

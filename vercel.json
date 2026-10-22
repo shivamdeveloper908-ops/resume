@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "routes": [
+    {
+      "src": "^/$",
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/login$",
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/signup$",
+      "dest": "/signup.html"
+    },
+    {
+      "src": "^/dashboard$",
+      "dest": "/dashboard.html"
+    },
+    {
+      "src": "^/analyzer$",
+      "dest": "/analyzer.html"
+    },
+    {
+      "src": "^/results$",
+      "dest": "/results.html"
+    },
+    {
+      "src": "^/history$",
+      "dest": "/history.html"
+    },
+    {
+      "src": "^/profile$",
+      "dest": "/profile.html"
+    },
+    {
+      "src": "^/resources$",
+      "dest": "/resources.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options",    "value": "nosniff" },
+        { "key": "X-Frame-Options",            "value": "DENY" },
+        { "key": "X-XSS-Protection",           "value": "1; mode=block" },
+        { "key": "Referrer-Policy",            "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/shared.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/matcher.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/shared.css",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    }
+  ]
+}

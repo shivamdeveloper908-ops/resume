@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeLens — Analyzer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<style>
+.two-col { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; }
+@media(max-width:820px){ .two-col{grid-template-columns:1fr;} }
+
+.file-chosen {
+  display:flex; align-items:center; gap:12px;
+  padding:14px 16px; background:var(--amber-bg);
+  border:1.5px solid rgba(245,154,8,.25); border-radius:10px; margin-top:10px;
+}
+.file-chosen-name { font-size:14px; font-weight:560; color:var(--ink); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.file-chosen-size { font-size:12.5px; color:var(--secondary); flex-shrink:0; }
+
+.parse-status { margin-top:10px; padding:10px 14px; border-radius:8px; font-size:13.5px; line-height:1.5; }
+.parse-status.parsing { background:rgba(59,130,246,.07); color:#1d4ed8; border:1px solid rgba(59,130,246,.15); }
+.parse-status.success { background:rgba(34,197,94,.07); color:#166534; border:1px solid rgba(34,197,94,.15); }
+.parse-status.error   { background:rgba(239,68,68,.07); color:#991b1b; border:1px solid rgba(239,68,68,.15); }
+
+.char-count { font-size:12px; color:var(--muted); text-align:right; margin-top:5px; }
+
+.demo-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 10px; border-radius:99px;
+  background:rgba(245,154,8,.12); color:var(--amber-dark);
+  font-size:12px; font-weight:600; border:1px solid rgba(245,154,8,.2);
+}
+
+/* Big Try Demo button below drop zone */
+.try-demo-big {
+  width:100%; margin-top:12px;
+  padding:14px; border-radius:12px;
+  border:2px dashed var(--amber);
+  background:rgba(245,154,8,.05);
+  cursor:pointer; font-family:inherit;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  font-size:15px; font-weight:640; color:var(--amber-dark);
+  transition:background .2s, border-color .2s;
+}
+.try-demo-big:hover { background:rgba(245,154,8,.12); border-color:var(--amber-dark); }
+.try-demo-big .tdicon { font-size:22px; }
+</style>
+</head>
+<body class="app-body">
+
+<nav class="sidebar" aria-label="Application navigation">
+  <div class="sidebar-header">
+    <a href="dashboard.html" class="logo logo-sm">
+      <span class="logo-tile"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="gANAL" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFC233"/><stop offset="100%" stop-color="#F58A07"/></linearGradient></defs>
+        <rect x="7" y="7" width="3.5" height="18" rx="1.2" fill="url(#gANAL)"/>
+        <path d="M10.5 7h5a4 4 0 0 1 0 8h-5V7z" fill="url(#gANAL)"/>
+        <path d="M13.5 15l5.5 10h-4l-5-10z" fill="url(#gANAL)"/>
+        <rect x="21" y="7" width="3.5" height="18" rx="1.2" fill="url(#gANAL)" opacity=".72"/>
+        <rect x="21" y="21.5" width="8" height="3.5" rx="1.2" fill="url(#gANAL)" opacity=".72"/>
+      </svg></span>
+      <span class="logo-wordmark" style="color:#fff">ResumeLens</span>
+    </a>
+  </div>
+  <div class="sidebar-nav">
+    <span class="nav-section">Menu</span>
+    <a href="dashboard.html"  class="nav-item" data-page="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="analyzer.html"  class="nav-item" data-page="analyzer.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Resume Analyzer</a>
+    <a href="history.html"   class="nav-item" data-page="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Analysis History</a>
+    <a href="resources.html" class="nav-item" data-page="resources.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Resources</a>
+    <span class="nav-section">Account</span>
+    <a href="profile.html"   class="nav-item" data-page="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile & Settings</a>
+  </div>
+  <div class="sidebar-footer">
+    <button class="nav-item" id="logout-btn" style="width:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Log Out</button>
+  </div>
+</nav>
+
+<main class="app-main">
+  <header class="app-topbar">
+    <span class="topbar-title">Resume Analyzer</span>
+    <div class="topbar-right">
+      <a href="profile.html" class="avatar-btn" aria-label="Profile" data-user-initial>?</a>
+    </div>
+  </header>
+
+  <div class="app-content">
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <h1 class="section-title">Analyze Your Resume</h1>
+        <p class="section-sub">Upload your resume and paste a job description to get an AI-powered match analysis.</p>
+      </div>
+      <div id="demo-indicator" style="display:none">
+        <span class="demo-badge">🧪 Demo Mode — <span id="demo-course-label">sample data</span> loaded</span>
+      </div>
+    </div>
+
+    <div class="two-col">
+
+      <!-- ── Resume upload card ── -->
+      <div class="app-card">
+        <div class="app-card-title" style="margin-bottom:14px">
+          📄 Resume
+          <span style="font-size:12px;font-weight:400;color:var(--muted);margin-left:6px">PDF or DOCX, max 10 MB</span>
+        </div>
+
+        <!-- Drop zone -->
+        <div class="drop-zone" id="drop-zone" role="button" aria-label="Upload resume file">
+          <input type="file" id="resume-file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Select resume file">
+          <div class="drop-zone-icon">☁️</div>
+          <div class="drop-zone-text">Drop your resume here or click to browse</div>
+          <div class="drop-zone-hint">Supported: PDF, DOCX</div>
+        </div>
+
+        <!-- ── BIG TRY DEMO BUTTON — right below the drop zone ── -->
+        <button type="button" class="try-demo-big" id="demo-btn" aria-label="Try with a demo resume">
+          <span class="tdicon">🧪</span>
+          <span>Try Demo — Load a Sample Resume for Your Field</span>
+        </button>
+
+        <!-- File chosen row -->
+        <div id="file-chosen" style="display:none">
+          <div class="file-chosen">
+            <span style="font-size:20px">📄</span>
+            <span class="file-chosen-name" id="file-name"></span>
+            <span class="file-chosen-size" id="file-size"></span>
+            <button type="button" class="btn btn-ghost btn-sm" id="remove-file" aria-label="Remove file">✕</button>
+          </div>
+        </div>
+
+        <div id="parse-status" class="parse-status" style="display:none"></div>
+
+        <div id="resume-preview-wrap" style="display:none;margin-top:12px">
+          <label class="app-label" style="margin-bottom:6px">Extracted Text Preview</label>
+          <textarea id="resume-preview" class="app-textarea" style="min-height:120px;font-size:12.5px;color:var(--secondary);resize:none;background:var(--surface-2)" readonly></textarea>
+        </div>
+      </div>
+
+      <!-- ── JD input card ── -->
+      <div class="app-card">
+        <div class="app-card-title" style="margin-bottom:14px">💼 Job Description</div>
+        <label class="app-label" for="jd-input">Paste the full job description below</label>
+        <textarea id="jd-input" class="app-textarea" style="min-height:260px"
+          placeholder="Paste the job posting here — include requirements, responsibilities, and preferred qualifications for best results."
+          aria-label="Job description"></textarea>
+        <div class="char-count"><span id="jd-chars">0</span> characters</div>
+        <div id="jd-error" style="display:none;margin-top:8px;font-size:13px;color:var(--danger)">Please paste a job description before analyzing.</div>
+        <label class="app-label" style="margin-top:16px" for="analysis-label">Analysis Label (optional)</label>
+        <input id="analysis-label" class="app-input" type="text" placeholder="e.g. Marketing Manager @ Unilever" aria-label="Analysis label">
+      </div>
+    </div>
+
+    <!-- Action row -->
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-lg" id="analyze-btn" disabled>
+        <span id="analyze-label">Analyze Resume</span>
+        <span id="analyze-spinner" class="spinner" style="display:none"></span>
+      </button>
+      <button class="btn btn-outline" id="reset-btn">Reset</button>
+      <p style="font-size:13px;color:var(--muted);flex:1">All analysis runs in your browser. Your resume is never uploaded to a server.</p>
+    </div>
+
+    <div id="analyze-error" style="display:none;padding:12px 16px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.18);border-radius:10px;font-size:14px;color:#991b1b"></div>
+
+  </div>
+</main>
+
+<script src="shared.js"></script>
+<script src="matcher.js"></script>
+<script>
+'use strict';
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+const user = Auth.requireAuth();
+if (!user) throw new Error('redirect');
+initSidebar();
+
+let resumeText = '', isParsing = false, isDemo = false;
+
+const dropZone       = document.getElementById('drop-zone');
+const fileInput      = document.getElementById('resume-file');
+const fileChosenWrap = document.getElementById('file-chosen');
+const fileNameEl     = document.getElementById('file-name');
+const fileSizeEl     = document.getElementById('file-size');
+const parseStatus    = document.getElementById('parse-status');
+const previewWrap    = document.getElementById('resume-preview-wrap');
+const previewEl      = document.getElementById('resume-preview');
+const jdInput        = document.getElementById('jd-input');
+const jdChars        = document.getElementById('jd-chars');
+const jdError        = document.getElementById('jd-error');
+const analyzeBtn     = document.getElementById('analyze-btn');
+const analyzeLabel   = document.getElementById('analyze-label');
+const analyzeSpinner = document.getElementById('analyze-spinner');
+const analyzeError   = document.getElementById('analyze-error');
+const resetBtn       = document.getElementById('reset-btn');
+const demoBtn        = document.getElementById('demo-btn');
+const demoIndicator  = document.getElementById('demo-indicator');
+const removeFileBtn  = document.getElementById('remove-file');
+
+/* ── drag-drop ── */
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+removeFileBtn.addEventListener('click', clearResume);
+jdInput.addEventListener('input', () => { jdChars.textContent = jdInput.value.length; jdError.style.display='none'; updateBtn(); });
+
+function updateBtn() {
+  analyzeBtn.disabled = !(resumeText.trim().length > 50 && jdInput.value.trim().length > 30);
+}
+
+/* ── file handler ── */
+async function handleFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['pdf','docx'].includes(ext)) { showStatus('error','❌ Unsupported file type. Please upload PDF or DOCX.'); return; }
+  if (file.size > 10*1024*1024)      { showStatus('error','❌ File exceeds 10 MB limit.'); return; }
+
+  fileChosenWrap.style.display = '';
+  fileNameEl.textContent = file.name;
+  fileSizeEl.textContent = fmt(file.size);
+  dropZone.style.display = 'none';
+  demoBtn.style.display  = 'none';
+  isDemo = false; demoIndicator.style.display = 'none';
+  resumeText = ''; updateBtn();
+  isParsing = true;
+  showStatus('parsing','⏳ Parsing document…');
+
+  try {
+    const text = ext === 'pdf' ? await parsePDF(file) : await parseDOCX(file);
+    if (!text || text.trim().length < 50) {
+      showStatus('error','❌ Could not extract readable text. This may be a scanned/image PDF. Please use a text-based PDF or DOCX.');
+      resumeText = '';
+    } else {
+      resumeText = text;
+      showStatus('success',`✅ Parsed — ${text.trim().split(/\s+/).length} words extracted.`);
+      previewEl.value = text.slice(0,800) + (text.length>800 ? '\n…(preview truncated)':'');
+      previewWrap.style.display = '';
+    }
+  } catch(err) {
+    showStatus('error','❌ Error parsing file: '+(err.message||'Unknown error.'));
+    resumeText = '';
+  }
+  isParsing = false; updateBtn();
+}
+
+async function parsePDF(file) {
+  const ab  = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data:ab}).promise;
+  let out = '';
+  for (let i=1;i<=pdf.numPages;i++) {
+    const p = await pdf.getPage(i);
+    const c = await p.getTextContent();
+    out += c.items.map(x=>x.str).join(' ') + '\n';
+  }
+  return out;
+}
+async function parseDOCX(file) {
+  const ab = await file.arrayBuffer();
+  return (await mammoth.extractRawText({arrayBuffer:ab})).value;
+}
+
+function clearResume() {
+  resumeText=''; isParsing=false; isDemo=false;
+  fileInput.value='';
+  fileChosenWrap.style.display='none';
+  dropZone.style.display='';
+  demoBtn.style.display='';
+  parseStatus.style.display='none';
+  previewWrap.style.display='none';
+  previewEl.value='';
+  demoIndicator.style.display='none';
+  updateBtn();
+}
+
+function showStatus(type, msg) {
+  parseStatus.className='parse-status '+type;
+  parseStatus.textContent=msg;
+  parseStatus.style.display='';
+}
+
+function fmt(b) {
+  if (b<1024) return b+' B';
+  if (b<1024*1024) return (b/1024).toFixed(1)+' KB';
+  return (b/(1024*1024)).toFixed(2)+' MB';
+}
+
+/* ══════════════════════════════════════════════════════
+   COURSE-SPECIFIC DEMO RESUMES
+   ══════════════════════════════════════════════════════ */
+const DEMO_DATA = {
+
+  software: {
+    label: 'Software Engineering Demo',
+    resumeLabel: 'Demo: Senior Software Engineer @ Data Platform',
+    resume: Matcher.DEMO_RESUME,
+    jd: Matcher.DEMO_JD,
+  },
+
+  mba: {
+    label: 'MBA Demo',
+    resumeLabel: 'Demo: Business Analyst @ McKinsey',
+    resume: `Priya Sharma
+priya.sharma@email.com | +1 (555) 987-6543 | linkedin.com/in/priyasharma | Mumbai / New York
+
+PROFESSIONAL SUMMARY
+MBA graduate with 4 years of experience in strategy consulting and business development. Proven track record in financial modelling, stakeholder management, and driving operational efficiency. Seeking a management consulting or strategy role.
+
+WORK EXPERIENCE
+Senior Business Analyst — Deloitte Consulting, New York (2022–Present)
+• Led end-to-end strategy projects for 6 Fortune 500 clients across FMCG and retail sectors
+• Built detailed financial models projecting $45M in cost savings over 3 years
+• Facilitated C-suite workshops and presented recommendations to boards of directors
+• Managed a cross-functional team of 5 analysts to deliver a market-entry strategy
+• Increased client retention by 30% through proactive relationship management
+
+Business Analyst — KPMG Advisory, Mumbai (2020–2022)
+• Conducted market research and competitive analysis for 12 client engagements
+• Developed Excel-based dashboards tracking KPIs for supply chain optimisation
+• Collaborated with HR and Finance to implement a cost-reduction programme saving ₹2.3 Cr
+
+EDUCATION
+MBA — Indian School of Business (ISB), Hyderabad (2020) — GPA 3.8/4.0
+B.Com (Hons) — Delhi University (2018)
+
+SKILLS
+Strategy: Business Strategy, Market Analysis, Competitive Intelligence, Go-to-Market
+Finance: Financial Modelling, P&L Management, Budgeting, Excel, Power BI
+Management: Project Management, Stakeholder Management, Team Leadership, Agile
+Tools: PowerPoint, Tableau, Salesforce, SAP, JIRA`,
+    jd: `Management Consultant — Strategy & Operations
+
+We are looking for an experienced Management Consultant to join our Strategy & Operations practice.
+
+Requirements:
+• MBA from a top-tier institution
+• 3–6 years of consulting or corporate strategy experience
+• Strong financial modelling and analytical skills (Excel, PowerPoint)
+• Experience with market research and competitive analysis
+• Excellent communication and stakeholder management skills
+• Ability to manage multiple projects and client relationships simultaneously
+• Experience with data visualisation tools (Tableau, Power BI)
+• Team leadership and project management experience
+
+Nice to have:
+• Prior experience in FMCG, retail, or financial services
+• Knowledge of Agile methodologies
+• Salesforce or SAP experience
+
+We value consultants who are structured thinkers, strong communicators, and can distil complex problems into clear, actionable recommendations.`,
+  },
+
+  marketing: {
+    label: 'Marketing Demo',
+    resumeLabel: 'Demo: Digital Marketing Manager @ Startup',
+    resume: `Alex Johnson
+alex.johnson@email.com | +1 (555) 234-5678 | linkedin.com/in/alexjohnson
+
+PROFESSIONAL SUMMARY
+Results-driven Digital Marketing Manager with 5 years of experience growing brands through SEO, paid media, content strategy, and social media. Increased organic traffic by 3x and managed $500K+ annual ad budgets.
+
+WORK EXPERIENCE
+Digital Marketing Manager — GrowthLab, San Francisco (2021–Present)
+• Grew organic website traffic from 50K to 180K monthly visitors through SEO and content strategy
+• Managed Google Ads and Meta Ads campaigns with $600K annual budget, achieving 4.2x ROAS
+• Led a team of 3 content creators and 2 SEO specialists
+• Launched 15 email campaigns with avg. open rate of 38% (industry avg: 22%)
+• Implemented HubSpot CRM, improving lead conversion by 28%
+
+Marketing Specialist — BrandBoost Agency, New York (2019–2021)
+• Managed social media accounts for 8 B2C clients (Instagram, TikTok, LinkedIn)
+• Created monthly performance reports using Google Analytics and Tableau
+• Ran A/B tests on landing pages that improved conversion rates by 18%
+
+EDUCATION
+B.Sc. Marketing — New York University (2019)
+
+SKILLS
+Digital Marketing: SEO, SEM, Google Ads, Meta Ads, Email Marketing, Content Strategy
+Analytics: Google Analytics, Tableau, HubSpot, Salesforce, A/B Testing
+Social Media: Instagram, TikTok, LinkedIn, Facebook, YouTube
+Tools: Canva, Adobe Photoshop, Mailchimp, WordPress, Hootsuite`,
+    jd: `Digital Marketing Manager
+
+We're hiring a Digital Marketing Manager to own our online presence and lead customer acquisition.
+
+Requirements:
+• 3–5 years digital marketing experience
+• Proven expertise in SEO and paid media (Google Ads, Meta Ads)
+• Experience managing advertising budgets of $200K+
+• Proficiency in Google Analytics, HubSpot or similar CRM
+• Strong content strategy and email marketing skills
+• Social media management experience (Instagram, LinkedIn)
+• A/B testing and conversion rate optimisation experience
+• Team management experience
+• Strong analytical mindset with data-driven decision making
+
+Nice to have:
+• Experience with Tableau or Power BI
+• Knowledge of Salesforce
+• Video content creation skills (TikTok, YouTube)`,
+  },
+
+  finance: {
+    label: 'Finance Demo',
+    resumeLabel: 'Demo: Financial Analyst @ Investment Bank',
+    resume: `Michael Chen
+michael.chen@email.com | +1 (555) 345-6789 | linkedin.com/in/michaelchen | CFA Level II Candidate
+
+PROFESSIONAL SUMMARY
+Financial Analyst with 4 years of experience in investment banking and equity research. Expert in financial modelling, DCF valuation, and M&A analysis. CFA Level II candidate with strong quantitative skills.
+
+WORK EXPERIENCE
+Senior Financial Analyst — Goldman Sachs, New York (2022–Present)
+• Built LBO, DCF, and comparable company models for 18 M&A transactions valued at $2.4B+
+• Prepared pitch books and board presentations for C-suite clients
+• Led due diligence for 4 acquisitions, identifying $120M in cost synergies
+• Managed analyst team of 3 on quarterly earnings reports for 25 coverage companies
+• Developed Python scripts automating financial data extraction, saving 8 hours/week
+
+Financial Analyst — JPMorgan Chase, New York (2020–2022)
+• Created detailed financial models and investment memos for equity research coverage
+• Analysed quarterly earnings, industry trends, and macroeconomic indicators
+• Assisted in roadshows and investor presentations for 6 IPOs
+
+EDUCATION
+B.Sc. Finance — Wharton School, University of Pennsylvania (2020) — GPA 3.9/4.0
+CFA Level II Candidate (2024)
+
+SKILLS
+Finance: Financial Modelling, DCF, LBO, M&A Analysis, Equity Research, Valuation
+Tools: Excel (advanced), Bloomberg, FactSet, Capital IQ, Python, SQL
+Reporting: PowerPoint, Tableau, Pitch Books, Investor Presentations`,
+    jd: `Financial Analyst — Investment Banking
+
+We are seeking a Financial Analyst to join our M&A advisory team.
+
+Requirements:
+• 2–4 years investment banking or financial analysis experience
+• Expert financial modelling skills: DCF, LBO, comparable company analysis
+• Strong Excel and PowerPoint skills
+• Experience with Bloomberg, FactSet or Capital IQ
+• M&A transaction experience preferred
+• CFA designation or progress towards it is a plus
+• Strong written and verbal communication skills
+• Ability to work in a fast-paced, deadline-driven environment
+• Attention to detail and high degree of accuracy
+
+Nice to have:
+• Python or SQL for data analysis
+• Tableau for data visualisation
+• Experience with equity research or investor relations`,
+  },
+
+  hr: {
+    label: 'HR Demo',
+    resumeLabel: 'Demo: HR Manager @ Tech Company',
+    resume: `Sarah Williams
+sarah.williams@email.com | +1 (555) 456-7890 | linkedin.com/in/sarahwilliams
+
+PROFESSIONAL SUMMARY
+Human Resources Manager with 6 years of experience in talent acquisition, employee engagement, and HR operations. Reduced time-to-hire by 40% and improved retention by 25% through strategic HR initiatives.
+
+WORK EXPERIENCE
+HR Manager — TechStartup Inc., Austin (2021–Present)
+• Led end-to-end recruitment for 120+ roles across engineering, sales, and marketing
+• Reduced time-to-hire from 45 to 27 days through process redesign and ATS implementation
+• Designed and launched employee onboarding programme with 92% satisfaction score
+• Managed performance review cycle for 200 employees using Workday
+• Developed DEI initiatives increasing underrepresented hires by 35%
+• Resolved 30+ employee relations cases, maintaining 0 formal grievances escalated
+
+HR Specialist — Enterprise Corp, Dallas (2018–2021)
+• Administered payroll, benefits, and HRIS data for 400-person organisation
+• Supported annual compensation benchmarking using salary survey data
+• Organised 12 L&D workshops with average attendance of 45 employees
+
+EDUCATION
+MBA (HR Specialisation) — UT Austin (2018)
+B.Sc. Psychology — University of Texas (2016)
+
+SKILLS
+HR: Talent Acquisition, Employee Relations, Performance Management, Compensation & Benefits
+HRIS: Workday, BambooHR, ATS (Greenhouse, Lever), HRIS Administration
+Compliance: Employment Law, DEI, Payroll, Policy Development
+Soft Skills: Communication, Conflict Resolution, Leadership, Data Analysis`,
+    jd: `HR Manager — People & Talent
+
+We are looking for an experienced HR Manager to lead our people operations.
+
+Requirements:
+• 5+ years HR generalist or HR management experience
+• Experience managing full-cycle recruitment across multiple functions
+• Proficiency with HRIS systems (Workday, BambooHR or similar)
+• Strong knowledge of employment law and HR compliance
+• Employee relations and conflict resolution experience
+• Performance management and compensation benchmarking skills
+• DEI programme experience
+• Excellent communication and stakeholder management
+• Data-driven approach to HR metrics and reporting
+
+Nice to have:
+• MBA or SHRM/CIPD certification
+• Experience in tech or high-growth startup environment
+• L&D programme design experience`,
+  },
+
+  data_science: {
+    label: 'Data Science Demo',
+    resumeLabel: 'Demo: Data Scientist @ Healthcare Tech',
+    resume: `Aisha Patel
+aisha.patel@email.com | +1 (555) 567-8901 | linkedin.com/in/aishapatel | github.com/aishapatel
+
+PROFESSIONAL SUMMARY
+Data Scientist with 4 years experience building ML models and extracting insights from complex datasets. Specialised in NLP and predictive modelling. Published 2 research papers on healthcare AI.
+
+WORK EXPERIENCE
+Senior Data Scientist — HealthAI, Boston (2022–Present)
+• Built NLP model to classify patient feedback with 94% accuracy, reducing manual review by 70%
+• Developed predictive readmission model using XGBoost, reducing 30-day readmissions by 18%
+• Led A/B testing framework for 12 product experiments, directly impacting $3M in revenue
+• Mentored team of 3 junior data scientists on ML best practices
+• Built automated data pipelines using Python and Apache Airflow
+
+Data Scientist — Analytics Corp, New York (2020–2022)
+• Created customer churn prediction model (AUC 0.89) saving $1.2M annually
+• Built dashboards in Tableau for C-suite reporting on KPIs and business metrics
+• Performed statistical analysis and hypothesis testing for pricing optimisation
+
+EDUCATION
+M.Sc. Data Science — MIT (2020) — GPA 4.0/4.0
+B.Sc. Statistics — University of Michigan (2018)
+
+SKILLS
+ML/AI: Machine Learning, Deep Learning, NLP, XGBoost, Scikit-learn, TensorFlow, PyTorch
+Languages: Python, R, SQL
+Data: Pandas, NumPy, Spark, Airflow, dbt
+Visualisation: Tableau, Matplotlib, Seaborn
+Statistics: A/B Testing, Hypothesis Testing, Statistical Modelling`,
+    jd: `Data Scientist — Machine Learning
+
+We're looking for a Data Scientist to build and deploy ML models that drive product decisions.
+
+Requirements:
+• 3–5 years data science experience
+• Strong Python and SQL skills
+• Experience with ML frameworks: Scikit-learn, TensorFlow or PyTorch
+• Statistical modelling and hypothesis testing experience
+• A/B testing and experimentation experience
+• Experience with data pipelines (Airflow, Spark or similar)
+• Strong communication skills — ability to present insights to non-technical stakeholders
+• Experience with Tableau or other BI tools
+
+Nice to have:
+• NLP or computer vision specialisation
+• Healthcare or fintech domain experience
+• Published research or Kaggle achievements
+• Experience with dbt or modern data stack`,
+  },
+
+  medical: {
+    label: 'Healthcare Demo',
+    resumeLabel: 'Demo: Clinical Research Associate',
+    resume: `Dr. James Okafor
+james.okafor@email.com | +1 (555) 678-9012 | linkedin.com/in/jamesokafor
+
+PROFESSIONAL SUMMARY
+Medical professional with MBBS and 5 years of clinical and research experience. Skilled in patient care, clinical trials, and evidence-based medicine. Seeking a clinical research or healthcare management role.
+
+WORK EXPERIENCE
+Clinical Research Associate — PharmaTrials Ltd., Chicago (2022–Present)
+• Monitored 6 Phase II/III clinical trials across 12 investigator sites
+• Ensured GCP compliance and maintained 100% audit-ready documentation
+• Resolved 45+ protocol deviations and prepared responses for IRB submissions
+• Collaborated with biostatistics team on data query resolution
+• Trained 20 site staff on protocol procedures and EDC systems
+
+Medical Officer — City General Hospital, Lagos (2019–2022)
+• Managed a daily caseload of 30–40 patients in internal medicine
+• Diagnosed and treated a wide range of acute and chronic conditions
+• Contributed to 3 peer-reviewed publications on infectious disease management
+• Supervised 2 medical interns and 4 nurses
+
+EDUCATION
+MBBS — University of Lagos College of Medicine (2019)
+Good Clinical Practice (GCP) Certification — CITI Program (2022)
+
+SKILLS
+Clinical: Patient Assessment, Diagnosis, Internal Medicine, Emergency Care
+Research: Clinical Trials, GCP, ICH Guidelines, Protocol Development, IRB Submissions
+Tools: Medidata Rave EDC, CTMS, Microsoft Office, Statistical Analysis (SPSS)
+Soft Skills: Communication, Leadership, Problem Solving, Teamwork`,
+    jd: `Clinical Research Associate (CRA)
+
+We are seeking a CRA to monitor clinical trials at investigator sites globally.
+
+Requirements:
+• MBBS, BSc Nursing, or equivalent life sciences degree
+• 2+ years clinical research or site monitoring experience
+• Knowledge of GCP, ICH guidelines, and FDA/EMA regulations
+• Experience with EDC systems (Medidata Rave or similar)
+• Strong attention to detail and documentation skills
+• Excellent communication and interpersonal skills
+• Ability to travel up to 50% of the time
+• Problem-solving and conflict resolution skills
+
+Nice to have:
+• Phase II/III trial experience
+• Experience in oncology or infectious disease
+• CITI or ACRP certification
+• CTMS experience`,
+  },
+
+  design: {
+    label: 'Design Demo',
+    resumeLabel: 'Demo: UX Designer @ Product Company',
+    resume: `Mei Lin
+mei.lin@email.com | +1 (555) 789-0123 | linkedin.com/in/meilin | portfolio: meilin.design
+
+PROFESSIONAL SUMMARY
+Product Designer with 5 years creating user-centred digital experiences. Led design for 3 apps with 1M+ combined users. Expert in Figma, design systems, and usability research.
+
+WORK EXPERIENCE
+Senior Product Designer — AppCo, San Francisco (2022–Present)
+• Designed end-to-end UX for a fintech mobile app, increasing activation rate by 34%
+• Built and maintained a design system with 200+ components used across 4 product teams
+• Conducted 60+ user interviews and usability tests informing major product pivots
+• Collaborated with engineering team to ensure pixel-perfect implementation
+• Reduced onboarding drop-off by 45% through iterative redesign
+
+UX Designer — AgencyX, New York (2019–2022)
+• Delivered UI/UX for 18 client projects across e-commerce, healthcare, and education
+• Created wireframes, prototypes, and high-fidelity mockups in Figma and Adobe XD
+• Ran design sprints and workshops with stakeholders to align on product direction
+
+EDUCATION
+B.F.A. Interaction Design — Parsons School of Design (2019)
+
+SKILLS
+Design: UI Design, UX Research, Wireframing, Prototyping, Design Systems, Information Architecture
+Tools: Figma, Adobe XD, Photoshop, Illustrator, Zeplin, InVision
+Research: User Interviews, Usability Testing, A/B Testing, Journey Mapping, Heuristic Analysis
+Soft Skills: Communication, Collaboration, Problem Solving, Presentation`,
+    jd: `Senior Product Designer — UX/UI
+
+We're hiring a Senior Product Designer to shape our user experience across web and mobile.
+
+Requirements:
+• 4–6 years product design experience
+• Expert Figma skills and experience building design systems
+• Strong UX research skills: user interviews, usability testing, journey mapping
+• Experience collaborating closely with product managers and engineers
+• Portfolio demonstrating end-to-end product design work
+• Strong visual design fundamentals
+• Experience with A/B testing and data-informed design decisions
+
+Nice to have:
+• Experience in fintech or SaaS products
+• Motion design or micro-interaction skills
+• Familiarity with front-end development (HTML/CSS)
+• Adobe Creative Suite experience`,
+  },
+
+  law: {
+    label: 'Law Demo',
+    resumeLabel: 'Demo: Associate Attorney @ Law Firm',
+    resume: `Emma Thompson
+emma.thompson@email.com | +1 (555) 890-1234 | linkedin.com/in/emmathompson | Bar: New York
+
+PROFESSIONAL SUMMARY
+Attorney with LLB and LLM (Corporate Law) with 4 years of experience in M&A transactions, contract negotiation, and corporate governance. Admitted to the New York Bar.
+
+WORK EXPERIENCE
+Associate Attorney — Clifford Chance, New York (2021–Present)
+• Advised on 14 M&A transactions with aggregate deal value of $1.8B
+• Drafted and negotiated SPAs, NDAs, shareholder agreements, and term sheets
+• Conducted legal due diligence for cross-border acquisitions in 6 jurisdictions
+• Researched regulatory compliance issues across SEC, GDPR, and Dodd-Frank
+• Supervised 2 junior associates and 3 paralegals on transaction teams
+
+Legal Intern — Sullivan & Cromwell, London (2019–2021)
+• Assisted senior partners on capital markets and private equity transactions
+• Drafted memoranda, legal opinions, and research notes on UK and EU law
+• Attended client meetings and negotiations with senior counsel
+
+EDUCATION
+LLM Corporate Law — Columbia Law School (2021) — Top 10%
+LLB — University of London (2019) — First Class Honours
+
+SKILLS
+Practice Areas: M&A, Corporate Law, Contract Law, Securities Law, Corporate Governance
+Legal Skills: Due Diligence, Contract Drafting, Legal Research, Regulatory Compliance
+Tools: Westlaw, LexisNexis, Microsoft Office, Contract Lifecycle Management
+Soft Skills: Negotiation, Communication, Analytical Thinking, Attention to Detail`,
+    jd: `Associate Attorney — Corporate M&A
+
+We are seeking an Associate Attorney to join our M&A practice group.
+
+Requirements:
+• JD or LLB/LLM from an accredited law school
+• 2–5 years M&A or corporate transaction experience
+• Experience drafting and negotiating SPAs, NDAs, and shareholder agreements
+• Legal due diligence experience
+• Strong legal research skills (Westlaw, LexisNexis)
+• Excellent written and verbal communication
+• Ability to manage multiple transactions simultaneously
+• Admitted to the state bar
+
+Nice to have:
+• Cross-border transaction experience
+• Securities or capital markets experience
+• Experience in private equity or venture capital`,
+  },
+
+  other: {
+    label: 'General Demo',
+    resumeLabel: 'Demo: General Professional Resume',
+    resume: Matcher.DEMO_RESUME,
+    jd: Matcher.DEMO_JD,
+  },
+};
+
+/* Fallback for courses without specific demo */
+const COURSE_FALLBACK = {
+  management: 'mba', devops: 'software', mechanical: 'other',
+  electrical: 'other', civil: 'other', nursing: 'medical',
+  pharmacy: 'medical', biology: 'medical', media: 'design',
+  architecture: 'design', psychology: 'hr', education: 'hr',
+  social_work: 'hr',
+};
+
+function getDemoForUser() {
+  const course = user.course || 'software';
+  const key    = COURSE_FALLBACK[course] || course;
+  return DEMO_DATA[key] || DEMO_DATA.software;
+}
+
+/* ── Try Demo button click ── */
+demoBtn.addEventListener('click', () => {
+  const demo = getDemoForUser();
+  clearResume();
+  resumeText = demo.resume;
+  jdInput.value = demo.jd;
+  jdChars.textContent = demo.jd.length;
+  isDemo = true;
+  document.getElementById('demo-course-label').textContent = demo.label;
+  demoIndicator.style.display = '';
+  fileChosenWrap.style.display = '';
+  fileNameEl.textContent = demo.label + ' (demo)';
+  fileSizeEl.textContent = '';
+  dropZone.style.display = 'none';
+  demoBtn.style.display  = 'none';
+  showStatus('success', '✅ ' + demo.label + ' loaded. Click "Analyze Resume" to try it.');
+  previewEl.value = demo.resume.slice(0,800) + (demo.resume.length>800?'\n…':'');
+  previewWrap.style.display = '';
+  document.getElementById('analysis-label').value = demo.resumeLabel;
+  updateBtn();
+  showToast(demo.label + ' loaded! Click Analyze Resume.', 'success');
+});
+
+/* ── Reset ── */
+resetBtn.addEventListener('click', () => {
+  clearResume();
+  jdInput.value = '';
+  jdChars.textContent = '0';
+  document.getElementById('analysis-label').value = '';
+  analyzeError.style.display = 'none';
+  jdError.style.display = 'none';
+});
+
+/* ── Analyze ── */
+analyzeBtn.addEventListener('click', async () => {
+  analyzeError.style.display = 'none';
+  if (!resumeText || resumeText.trim().length < 50) {
+    analyzeError.textContent = 'Please upload a resume first.';
+    analyzeError.style.display = '';
+    return;
+  }
+  if (!jdInput.value.trim() || jdInput.value.trim().length < 30) {
+    jdError.style.display = '';
+    return;
+  }
+  analyzeBtn.disabled = true;
+  analyzeLabel.style.display = 'none';
+  analyzeSpinner.style.display = '';
+  await new Promise(r => setTimeout(r, 900));
+  try {
+    const result = Matcher.analyze(resumeText, jdInput.value);
+    const label  = document.getElementById('analysis-label').value.trim() || (isDemo ? 'Demo Analysis' : 'Untitled Analysis');
+    const entry  = History.save(user.id, { label, score:result.finalScore, atsScore:result.ats.score, result, isDemo });
+    window.location.href = 'results.html?id=' + entry.id;
+  } catch(err) {
+    analyzeBtn.disabled = false;
+    analyzeLabel.style.display = '';
+    analyzeSpinner.style.display = 'none';
+    analyzeError.textContent = err.message || 'Analysis failed. Please try again.';
+    analyzeError.style.display = '';
+  }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => { Auth.logout(); window.location.href='index.html'; });
+</script>
+</body>
+</html>

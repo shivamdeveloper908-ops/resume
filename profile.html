@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeLens — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.profile-avatar {
+  width:80px; height:80px; border-radius:50%;
+  background:var(--amber); color:#000;
+  font-size:32px; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.settings-section {
+  background:#fff; border:1px solid var(--border); border-radius:16px;
+  padding:24px 26px;
+}
+.settings-section + .settings-section { margin-top:18px; }
+.settings-title { font-size:16px; font-weight:660; color:var(--ink); margin-bottom:18px; }
+.settings-row {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:12px 0; border-bottom:1px solid var(--surface-2);
+  flex-wrap:wrap;
+}
+.settings-row:last-child { border-bottom:none; }
+.settings-row-label { font-size:14px; font-weight:560; color:var(--ink); }
+.settings-row-value { font-size:14px; color:var(--secondary); }
+</style>
+</head>
+<body class="app-body">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar" aria-label="Application navigation">
+  <div class="sidebar-header">
+    <a href="dashboard.html" class="logo logo-sm">
+      <span class="logo-tile"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="gPROF" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFC233"/>
+      <stop offset="100%" stop-color="#F58A07"/>
+    </linearGradient>
+  </defs>
+  <!-- R: vertical bar + top bump + diagonal leg -->
+  <rect x="7" y="7" width="3.5" height="18" rx="1.2" fill="url(#gPROF)"/>
+  <path d="M10.5 7h5a4 4 0 0 1 0 8h-5V7z" fill="url(#gPROF)"/>
+  <path d="M13.5 15l5.5 10h-4l-5-10z" fill="url(#gPROF)"/>
+  <!-- L: vertical bar + bottom shelf -->
+  <rect x="21" y="7" width="3.5" height="18" rx="1.2" fill="url(#gPROF)" opacity=".72"/>
+  <rect x="21" y="21.5" width="8" height="3.5" rx="1.2" fill="url(#gPROF)" opacity=".72"/>
+</svg></span>
+      <span class="logo-wordmark" style="color:#fff">ResumeLens</span>
+    </a>
+  </div>
+  <div class="sidebar-nav">
+    <span class="nav-section">Menu</span>
+    <a href="dashboard.html" class="nav-item" data-page="dashboard.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+    </a>
+    <a href="analyzer.html" class="nav-item" data-page="analyzer.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Resume Analyzer
+    </a>
+    <a href="history.html" class="nav-item" data-page="history.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Analysis History</a>
+    <a href="resources.html" class="nav-item" data-page="resources.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Resources
+    </a>
+    <span class="nav-section">Account</span>
+    <a href="profile.html" class="nav-item" data-page="profile.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile & Settings
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <button class="nav-item" id="logout-btn" style="width:100%">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 0-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Log Out
+    </button>
+  </div>
+</nav>
+
+<!-- ── Main ── -->
+<main class="app-main">
+  <header class="app-topbar">
+    <span class="topbar-title">Profile & Settings</span>
+    <div class="topbar-right">
+      <a href="analyzer.html" class="btn btn-primary btn-sm">New Analysis</a>
+      <button class="avatar-btn" data-user-initial aria-label="Profile">?</button>
+    </div>
+  </header>
+
+  <div class="app-content">
+
+    <!-- Profile card -->
+    <div class="settings-section" style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+      <div class="profile-avatar" id="avatar-initial">?</div>
+      <div>
+        <div style="font-size:22px;font-weight:700;letter-spacing:-.4px" id="profile-name">—</div>
+        <div style="font-size:15px;color:var(--secondary);margin-top:4px" id="profile-email">—</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px" id="profile-count">—</div>
+      </div>
+    </div>
+
+    <!-- Edit name -->
+    <div class="settings-section">
+      <div class="settings-title">Account Information</div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Display Name</div>
+          <div class="settings-row-value" id="display-name-val">—</div>
+        </div>
+        <button class="btn btn-outline btn-sm" id="edit-name-btn">Edit</button>
+      </div>
+
+      <div id="edit-name-form" style="display:none;padding:14px 0;border-bottom:1px solid var(--surface-2)">
+        <label class="app-label" for="new-name-input">New Display Name</label>
+        <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap">
+          <input class="app-input" id="new-name-input" type="text" placeholder="Your full name" style="flex:1;min-width:200px">
+          <button class="btn btn-primary" id="save-name-btn">Save</button>
+          <button class="btn btn-outline" id="cancel-name-btn">Cancel</button>
+        </div>
+        <div id="name-save-error" style="display:none;font-size:13px;color:var(--danger);margin-top:6px"></div>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Email Address</div>
+          <div class="settings-row-value" id="email-val">—</div>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Member Since</div>
+          <div class="settings-row-value" id="member-since">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change password -->
+    <div class="settings-section">
+      <div class="settings-title">Security</div>
+
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Password</div>
+          <div class="settings-row-value">••••••••</div>
+        </div>
+        <button class="btn btn-outline btn-sm" id="change-pw-btn">Change Password</button>
+      </div>
+
+      <div id="change-pw-form" style="display:none;padding:14px 0">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label class="app-label" for="cur-pw">Current Password</label>
+            <input class="app-input" id="cur-pw" type="password" placeholder="Current password" autocomplete="current-password">
+          </div>
+          <div>
+            <label class="app-label" for="new-pw">New Password</label>
+            <input class="app-input" id="new-pw" type="password" placeholder="New password (min 8 chars)" autocomplete="new-password">
+          </div>
+          <div>
+            <label class="app-label" for="confirm-pw">Confirm New Password</label>
+            <input class="app-input" id="confirm-pw" type="password" placeholder="Repeat new password" autocomplete="new-password">
+          </div>
+          <div id="pw-change-error" style="display:none;font-size:13px;color:var(--danger)"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary" id="save-pw-btn">Update Password</button>
+            <button class="btn btn-outline" id="cancel-pw-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data & storage -->
+    <div class="settings-section">
+      <div class="settings-title">Data & Storage</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Analyses Stored</div>
+          <div class="settings-row-value" id="storage-count">—</div>
+        </div>
+        <a href="history.html" class="btn btn-outline btn-sm">Manage</a>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Storage Location</div>
+          <div class="settings-row-value">Browser local storage (this device only)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="settings-section" style="border-color:#fca5a5">
+      <div class="settings-title" style="color:var(--danger)">Danger Zone</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Sign Out</div>
+          <div class="settings-row-value">Sign out of your account on this device.</div>
+        </div>
+        <button class="btn btn-danger btn-sm" id="signout-btn">Sign Out</button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Delete Account</div>
+          <div class="settings-row-value">Permanently delete your account and all analysis history.</div>
+        </div>
+        <button class="btn btn-danger btn-sm" id="delete-account-btn">Delete Account</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Confirm modal -->
+<div id="confirm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center" aria-modal="true" role="dialog">
+  <div style="background:#fff;border-radius:18px;padding:32px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:16px">
+    <h3 style="font-size:18px;font-weight:660;letter-spacing:-.4px" id="confirm-title">Confirm</h3>
+    <p style="font-size:14.5px;color:var(--secondary);line-height:1.6" id="confirm-msg">Are you sure?</p>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-danger" id="confirm-yes" style="flex:1">Confirm</button>
+      <button class="btn btn-outline" id="confirm-no" style="flex:1">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  const user = Auth.requireAuth();
+  if (!user) throw new Error('redirect');
+  initSidebar();
+
+  let confirmCallback = null;
+
+  function loadProfile() {
+    const u = Auth.getCurrentUser();
+    const initial = (u.name || '?')[0].toUpperCase();
+    document.getElementById('avatar-initial').textContent = initial;
+    document.getElementById('profile-name').textContent   = u.name || '—';
+    document.getElementById('profile-email').textContent  = u.email || '—';
+    document.getElementById('display-name-val').textContent = u.name || '—';
+    document.getElementById('email-val').textContent       = u.email || '—';
+    document.getElementById('member-since').textContent   =
+      new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
+
+    const count = History.getAll(u.id).length;
+    document.getElementById('profile-count').textContent = `${count} ${count === 1 ? 'analysis' : 'analyses'} completed`;
+    document.getElementById('storage-count').textContent = `${count} ${count === 1 ? 'analysis' : 'analyses'}`;
+    // Update topbar avatar
+    document.querySelectorAll('[data-user-initial]').forEach(el => el.textContent = initial);
+  }
+  loadProfile();
+
+  // ── Edit name ──────────────────────────────────────────────
+  document.getElementById('edit-name-btn').addEventListener('click', () => {
+    document.getElementById('edit-name-form').style.display = '';
+    document.getElementById('new-name-input').value = Auth.getCurrentUser().name || '';
+    document.getElementById('edit-name-btn').style.display = 'none';
+  });
+  document.getElementById('cancel-name-btn').addEventListener('click', () => {
+    document.getElementById('edit-name-form').style.display = 'none';
+    document.getElementById('edit-name-btn').style.display = '';
+  });
+  document.getElementById('save-name-btn').addEventListener('click', () => {
+    const val = document.getElementById('new-name-input').value.trim();
+    if (!val) {
+      document.getElementById('name-save-error').textContent = 'Name cannot be empty.';
+      document.getElementById('name-save-error').style.display = '';
+      return;
+    }
+    if (Auth.updateName(val)) {
+      loadProfile();
+      document.getElementById('edit-name-form').style.display = 'none';
+      document.getElementById('edit-name-btn').style.display = '';
+      document.getElementById('name-save-error').style.display = 'none';
+      showToast('Name updated!', 'success');
+    }
+  });
+
+  // ── Change password ────────────────────────────────────────
+  document.getElementById('change-pw-btn').addEventListener('click', () => {
+    document.getElementById('change-pw-form').style.display = '';
+    document.getElementById('change-pw-btn').style.display = 'none';
+  });
+  document.getElementById('cancel-pw-btn').addEventListener('click', () => {
+    document.getElementById('change-pw-form').style.display = 'none';
+    document.getElementById('change-pw-btn').style.display = '';
+    ['cur-pw','new-pw','confirm-pw'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pw-change-error').style.display = 'none';
+  });
+  document.getElementById('save-pw-btn').addEventListener('click', () => {
+    const cur  = document.getElementById('cur-pw').value;
+    const nw   = document.getElementById('new-pw').value;
+    const conf = document.getElementById('confirm-pw').value;
+    const errEl = document.getElementById('pw-change-error');
+
+    if (!cur || !nw || !conf) { errEl.textContent='All fields are required.'; errEl.style.display=''; return; }
+    if (nw.length < 8)         { errEl.textContent='New password must be at least 8 characters.'; errEl.style.display=''; return; }
+    if (nw !== conf)            { errEl.textContent='New passwords do not match.'; errEl.style.display=''; return; }
+
+    const result = Auth.changePassword({ currentPassword: cur, newPassword: nw });
+    if (result.ok) {
+      document.getElementById('change-pw-form').style.display = 'none';
+      document.getElementById('change-pw-btn').style.display = '';
+      ['cur-pw','new-pw','confirm-pw'].forEach(id => document.getElementById(id).value = '');
+      errEl.style.display = 'none';
+      showToast('Password updated!', 'success');
+    } else {
+      errEl.textContent = result.error;
+      errEl.style.display = '';
+    }
+  });
+
+  // ── Sign out ───────────────────────────────────────────────
+  document.getElementById('signout-btn').addEventListener('click', () => {
+    Auth.logout(); window.location.href = 'index.html';
+  });
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    Auth.logout(); window.location.href = 'index.html';
+  });
+
+  // ── Delete account ─────────────────────────────────────────
+  document.getElementById('delete-account-btn').addEventListener('click', () => {
+    document.getElementById('confirm-title').textContent = 'Delete Account';
+    document.getElementById('confirm-msg').textContent =
+      'This will permanently delete your account and all analysis history. This action cannot be undone.';
+    document.getElementById('confirm-overlay').style.display = 'flex';
+    confirmCallback = () => { Auth.deleteAccount(); window.location.href = 'index.html'; };
+  });
+
+  document.getElementById('confirm-yes').addEventListener('click', () => {
+    document.getElementById('confirm-overlay').style.display = 'none';
+    if (confirmCallback) { confirmCallback(); confirmCallback = null; }
+  });
+  document.getElementById('confirm-no').addEventListener('click', () => {
+    document.getElementById('confirm-overlay').style.display = 'none';
+    confirmCallback = null;
+  });
+</script>
+</body>
+</html>

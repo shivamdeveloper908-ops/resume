@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeLens — Resources</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* Tabs */
+.tab-bar {
+  display:flex; gap:4px;
+  background:#fff; border:1px solid var(--border);
+  border-radius:14px; padding:5px; flex-wrap:wrap;
+}
+.tab-btn {
+  padding:9px 18px; border:none; cursor:pointer; border-radius:10px;
+  font-family:inherit; font-size:14px; font-weight:560; color:var(--secondary);
+  background:transparent; transition:background .18s, color .18s;
+}
+.tab-btn:hover  { background:var(--surface-2); color:var(--ink); }
+.tab-btn.active { background:var(--btn); color:var(--amber); font-weight:660; }
+
+.tab-panel { display:none; }
+.tab-panel.active { display:contents; }
+
+/* Resource cards */
+.resource-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; }
+.resource-card {
+  background:#fff; border:1.5px solid var(--border); border-radius:14px;
+  padding:22px; display:flex; flex-direction:column; gap:10px;
+  transition:border-color .2s, box-shadow .2s;
+}
+.resource-card:hover { border-color:var(--amber); box-shadow:0 4px 20px rgba(245,154,8,.1); }
+.rc-icon   { font-size:32px; line-height:1; }
+.rc-title  { font-size:15px; font-weight:660; color:var(--ink); }
+.rc-desc   { font-size:13.5px; color:var(--secondary); line-height:1.55; flex:1; }
+.rc-tag    { font-size:11.5px; font-weight:640; padding:2px 9px; border-radius:99px; width:fit-content; }
+.rc-tag.green  { background:rgba(34,197,94,.1); color:#166534; }
+.rc-tag.amber  { background:var(--amber-bg); color:var(--amber-dark); }
+.rc-tag.blue   { background:rgba(59,130,246,.08); color:#1d4ed8; }
+
+/* Checklist */
+.checklist { display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+.check-item {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 14px; background:var(--surface-2);
+  border:1px solid var(--border); border-radius:10px;
+  cursor:pointer; user-select:none; transition:background .15s;
+}
+.check-item:hover { background:#f0f0ee; }
+.check-item input[type="checkbox"] {
+  width:18px; height:18px; accent-color:var(--amber);
+  flex-shrink:0; margin-top:1px; cursor:pointer;
+}
+.check-item label { font-size:13.5px; color:var(--ink); line-height:1.5; cursor:pointer; flex:1; }
+.check-item.done label { text-decoration:line-through; color:var(--muted); }
+
+/* Interview Q&A */
+.qa-item {
+  border:1px solid var(--border); border-radius:12px; overflow:hidden;
+  background:#fff; margin-bottom:10px;
+}
+.qa-q {
+  padding:14px 18px; font-size:14px; font-weight:580; color:var(--ink);
+  cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+  transition:background .15s; gap:12px;
+}
+.qa-q:hover { background:var(--surface-2); }
+.qa-q .qa-arrow { color:var(--muted); font-size:18px; flex-shrink:0; transition:transform .2s; }
+.qa-a {
+  padding:0 18px; max-height:0; overflow:hidden;
+  font-size:13.5px; color:var(--secondary); line-height:1.65;
+  transition:max-height .3s ease, padding .3s ease;
+}
+.qa-item.open .qa-q .qa-arrow { transform:rotate(180deg); }
+.qa-item.open .qa-a { max-height:400px; padding:0 18px 14px; }
+
+/* Salary table */
+.salary-table { width:100%; border-collapse:collapse; margin-top:6px; }
+.salary-table th {
+  text-align:left; font-size:12px; font-weight:640; color:var(--muted);
+  text-transform:uppercase; letter-spacing:.06em;
+  padding:0 14px 10px; border-bottom:1px solid var(--border);
+}
+.salary-table td {
+  padding:13px 14px; font-size:14px; color:var(--ink);
+  border-bottom:1px solid var(--surface-2); vertical-align:middle;
+}
+.salary-table tr:last-child td { border-bottom:none; }
+.salary-table tr:hover td { background:var(--surface-2); }
+.sal-bar-wrap { display:flex; align-items:center; gap:10px; }
+.sal-bar { height:6px; border-radius:99px; background:var(--amber); min-width:4px; }
+
+/* Tips accordion section */
+.tip-section { margin-bottom:8px; }
+.tip-header {
+  padding:14px 18px; background:#fff; border:1px solid var(--border);
+  border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; gap:12px; transition:background .15s;
+}
+.tip-header:hover { background:var(--surface-2); }
+.tip-header span.tip-icon { font-size:20px; }
+.tip-body {
+  margin-top:6px; padding:14px 18px;
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:12px; font-size:13.5px; color:var(--secondary); line-height:1.65;
+  display:none;
+}
+.tip-body.open { display:block; }
+.tip-body ul { padding-left:18px; margin-top:6px; display:flex; flex-direction:column; gap:5px; }
+
+/* Progress bar for skill score */
+.skill-progress-row { display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid var(--surface-2); }
+.skill-progress-row:last-child { border-bottom:none; }
+.sp-label { font-size:13.5px; color:var(--ink); font-weight:540; width:200px; flex-shrink:0; }
+.sp-bar   { flex:1; height:8px; background:var(--line2); border-radius:99px; overflow:hidden; }
+.sp-fill  { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--amber),#FFC233); }
+.sp-val   { font-size:13px; font-weight:640; color:var(--ink); width:42px; text-align:right; flex-shrink:0; }
+</style>
+</head>
+<body class="app-body">
+
+<nav class="sidebar" aria-label="Application navigation">
+  <div class="sidebar-header">
+    <a href="dashboard.html" class="logo logo-sm">
+      <span class="logo-tile"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="gRSRC" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFC233"/>
+      <stop offset="100%" stop-color="#F58A07"/>
+    </linearGradient>
+  </defs>
+  <!-- R: vertical bar + top bump + diagonal leg -->
+  <rect x="7" y="7" width="3.5" height="18" rx="1.2" fill="url(#gRSRC)"/>
+  <path d="M10.5 7h5a4 4 0 0 1 0 8h-5V7z" fill="url(#gRSRC)"/>
+  <path d="M13.5 15l5.5 10h-4l-5-10z" fill="url(#gRSRC)"/>
+  <!-- L: vertical bar + bottom shelf -->
+  <rect x="21" y="7" width="3.5" height="18" rx="1.2" fill="url(#gRSRC)" opacity=".72"/>
+  <rect x="21" y="21.5" width="8" height="3.5" rx="1.2" fill="url(#gRSRC)" opacity=".72"/>
+</svg></span>
+      <span class="logo-wordmark" style="color:#fff">ResumeLens</span>
+    </a>
+  </div>
+  <div class="sidebar-nav">
+    <span class="nav-section">Menu</span>
+    <a href="dashboard.html"  class="nav-item" data-page="dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="analyzer.html"  class="nav-item" data-page="analyzer.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Resume Analyzer</a>
+    <a href="history.html"   class="nav-item" data-page="history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Analysis History</a>
+    <a href="resources.html" class="nav-item" data-page="resources.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Resources</a>
+    <span class="nav-section">Account</span>
+    <a href="profile.html"   class="nav-item" data-page="profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile & Settings</a>
+  </div>
+  <div class="sidebar-footer">
+    <button class="nav-item" id="logout-btn" style="width:100%"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Log Out</button>
+  </div>
+</nav>
+
+<main class="app-main">
+  <header class="app-topbar">
+    <span class="topbar-title">Career Resources</span>
+    <div class="topbar-right">
+      <a href="analyzer.html" class="btn btn-primary btn-sm">New Analysis</a>
+      <a href="profile.html" class="avatar-btn" data-user-initial>?</a>
+    </div>
+  </header>
+
+  <div class="app-content">
+
+    <!-- Header -->
+    <div>
+      <h1 class="section-title">Career Resources</h1>
+      <p class="section-sub">Everything you need to land your next role — tips, prep, salary data, and more.</p>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" role="tablist">
+      <button class="tab-btn active" data-tab="resume"    role="tab">📄 Resume Tips</button>
+      <button class="tab-btn"        data-tab="cover"     role="tab">✉️ Cover Letter</button>
+      <button class="tab-btn"        data-tab="interview" role="tab">🎤 Interview Prep</button>
+      <button class="tab-btn"        data-tab="salary"    role="tab">💰 Salary Insights</button>
+      <button class="tab-btn"        data-tab="checklist" role="tab">✅ Job Checklist</button>
+    </div>
+
+    <!-- ════ RESUME TIPS ════ -->
+    <div class="tab-panel active" id="tab-resume">
+
+      <div style="margin-bottom:16px">
+        <h2 class="section-title" style="font-size:17px">Resume Writing Tips</h2>
+        <p class="section-sub">Best practices that make your resume stand out to both humans and ATS systems.</p>
+      </div>
+
+      <div class="tip-section">
+        <div class="tip-header" onclick="toggleTip(this)"><span class="tip-icon">🎯</span><span>Use a strong professional summary</span><span style="margin-left:auto;color:var(--muted)">▾</span></div>
+        <div class="tip-body">Write 2–3 sentences that immediately communicate who you are and what you offer. Tailor it to every role. Example: <em>"Results-driven software engineer with 5 years building scalable Python APIs. Reduced infra cost by 40% at TechCorp. Seeking senior backend roles in fintech."</em>
+          <ul><li>Put it at the very top, after your contact info</li><li>Match keywords from the job description</li><li>Focus on value delivered, not duties</li></ul>
+        </div>
+      </div>
+
+      <div class="tip-section">
+        <div class="tip-header" onclick="toggleTip(this)"><span class="tip-icon">🔢</span><span>Quantify your achievements</span><span style="margin-left:auto;color:var(--muted)">▾</span></div>
+        <div class="tip-body">Numbers make your impact concrete and memorable. Replace vague descriptions with measurable results.
+          <ul><li>❌ "Responsible for improving the checkout process"</li><li>✅ "Reduced checkout abandonment by 22% by redesigning the payment flow"</li><li>❌ "Led a team of engineers"</li><li>✅ "Led a team of 6 engineers to deliver a $2M product launch on time"</li><li>Use metrics wherever you can substantiate them</li></ul>
+        </div>
+      </div>
+
+      <div class="tip-section">
+        <div class="tip-header" onclick="toggleTip(this)"><span class="tip-icon">📐</span><span>Structure and formatting best practices</span><span style="margin-left:auto;color:var(--muted)">▾</span></div>
+        <div class="tip-body">ATS systems and recruiters both benefit from clear structure.
+          <ul><li>Use clear section headings: Work Experience, Education, Skills, Projects</li><li>Reverse chronological order (most recent first)</li><li>Consistent bullet points — avoid mixing styles</li><li>Single column for ATS compatibility (avoid tables and text boxes)</li><li>Keep to 1–2 pages for most roles</li><li>Font: 10–12pt, standard typefaces (not decorative)</li><li>Save as PDF unless the job posting specifies otherwise</li></ul>
+        </div>
+      </div>
+
+      <div class="tip-section">
+        <div class="tip-header" onclick="toggleTip(this)"><span class="tip-icon">🔑</span><span>Keywords and ATS optimisation</span><span style="margin-left:auto;color:var(--muted)">▾</span></div>
+        <div class="tip-body">Many companies use ATS software that filters resumes by keyword match before a human sees them.
+          <ul><li>Use ResumeLens keyword analysis to find missing terms</li><li>Mirror the exact language from the job description where accurate</li><li>Include both long-form and abbreviated versions: "Machine Learning (ML)"</li><li>Avoid images, headers/footers with key info, and tables — ATS may skip them</li><li>Don't keyword-stuff — write naturally; only include terms that reflect your real experience</li></ul>
+        </div>
+      </div>
+
+      <div class="tip-section">
+        <div class="tip-header" onclick="toggleTip(this)"><span class="tip-icon">🛠️</span><span>Skills section guide</span><span style="margin-left:auto;color:var(--muted)">▾</span></div>
+        <div class="tip-body">A well-structured skills section helps both ATS and hiring managers quickly assess your fit.
+          <ul><li>Group by category: Languages, Frameworks, Tools, Cloud, Soft Skills</li><li>List skills you'd be comfortable discussing in an interview</li><li>Don't over-inflate — listing a skill you can't demonstrate hurts you</li><li>Include tools and technologies from your most recent 3–5 years</li></ul>
+        </div>
+      </div>
+
+      <div class="resource-grid" style="margin-top:24px">
+        <div class="resource-card">
+          <div class="rc-icon">⚡</div>
+          <div class="rc-title">Action Verb Starters</div>
+          <div class="rc-desc">Start every bullet with a strong verb: <strong>Built, Designed, Led, Reduced, Shipped, Optimised, Launched, Automated, Improved, Scaled, Mentored, Delivered.</strong></div>
+          <div class="rc-tag amber">Quick Reference</div>
+        </div>
+        <div class="resource-card">
+          <div class="rc-icon">📏</div>
+          <div class="rc-title">Ideal Resume Length</div>
+          <div class="rc-desc">0–5 years experience: 1 page. 5–10 years: 1–2 pages. 10+ years or senior/exec roles: up to 2 pages. Academic CVs can be longer.</div>
+          <div class="rc-tag green">Best Practice</div>
+        </div>
+        <div class="resource-card">
+          <div class="rc-icon">🔄</div>
+          <div class="rc-title">Tailor for Every Job</div>
+          <div class="rc-desc">Generic resumes underperform. Spend 10 minutes swapping in role-specific keywords and reordering bullet points to match each application.</div>
+          <div class="rc-tag blue">Pro Tip</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ COVER LETTER ════ -->
+    <div class="tab-panel" id="tab-cover">
+
+      <div style="margin-bottom:16px">
+        <h2 class="section-title" style="font-size:17px">Cover Letter Framework</h2>
+        <p class="section-sub">A great cover letter answers one question: why are you the right person for this specific role?</p>
+      </div>
+
+      <div class="app-card" style="margin-bottom:16px">
+        <div class="app-card-title">📝 The 4-Paragraph Structure</div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--amber-bg);color:var(--amber-dark);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+            <div><strong style="font-size:14px">The Hook</strong><p style="font-size:13.5px;color:var(--secondary);margin-top:4px;line-height:1.6">State the role and why you want it specifically. Mention something specific about the company — a product, mission, or recent news. Shows you've done your homework.</p></div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--amber-bg);color:var(--amber-dark);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+            <div><strong style="font-size:14px">Your Strongest Match</strong><p style="font-size:13.5px;color:var(--secondary);margin-top:4px;line-height:1.6">Pick your 1–2 most relevant experiences and explain how they map to the key requirements. Use numbers. This is the most important paragraph.</p></div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--amber-bg);color:var(--amber-dark);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+            <div><strong style="font-size:14px">Why This Company</strong><p style="font-size:13.5px;color:var(--secondary);margin-top:4px;line-height:1.6">Explain what excites you about this specific team or company. Culture, product, problem space, or growth stage. Avoid generic praise.</p></div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--amber-bg);color:var(--amber-dark);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+            <div><strong style="font-size:14px">The Close</strong><p style="font-size:13.5px;color:var(--secondary);margin-top:4px;line-height:1.6">Thank them for their time, reiterate your enthusiasm, and request an interview. Keep it short and direct.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="resource-grid">
+        <div class="resource-card">
+          <div class="rc-icon">❌</div>
+          <div class="rc-title">Common Mistakes to Avoid</div>
+          <div class="rc-desc">• Starting with "I am writing to apply…"<br>• Repeating your resume line-by-line<br>• Writing more than one page<br>• Forgetting to address it to a specific person<br>• Spelling the company name wrong</div>
+          <div class="rc-tag red" style="background:rgba(239,68,68,.08);color:#991b1b;border:1px solid rgba(239,68,68,.18);font-size:11.5px;font-weight:640;padding:2px 9px;border-radius:99px;width:fit-content">Avoid These</div>
+        </div>
+        <div class="resource-card">
+          <div class="rc-icon">✨</div>
+          <div class="rc-title">Opening Line Examples</div>
+          <div class="rc-desc">Strong openers that grab attention:<br><br><em>"After building data pipelines that process 10M events/day, I'm excited to bring that scale experience to [Company]'s data platform team."</em><br><br><em>"Your recent launch of [Product] is exactly the kind of problem I've been solving — here's why I'm the right engineer for the role."</em></div>
+          <div class="rc-tag blue">Templates</div>
+        </div>
+        <div class="resource-card">
+          <div class="rc-icon">📏</div>
+          <div class="rc-title">Length & Format</div>
+          <div class="rc-desc">• 3–4 paragraphs, never more than 1 page<br>• Use the same font as your resume<br>• Short paragraphs (3–5 sentences max)<br>• Address to hiring manager by name if possible (check LinkedIn)<br>• Send as PDF</div>
+          <div class="rc-tag amber">Formatting</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ INTERVIEW PREP ════ -->
+    <div class="tab-panel" id="tab-interview">
+
+      <div style="margin-bottom:16px">
+        <h2 class="section-title" style="font-size:17px">Interview Preparation</h2>
+        <p class="section-sub">Practice these questions and frameworks before your next interview.</p>
+      </div>
+
+      <!-- Behavioural questions -->
+      <div class="app-card" style="margin-bottom:20px">
+        <div class="app-card-title">🗣️ Behavioural Questions (STAR Method)</div>
+        <div class="app-card-sub">Answer with: <strong>Situation → Task → Action → Result</strong></div>
+        <div style="margin-top:16px" id="beh-questions"></div>
+      </div>
+
+      <!-- Technical round tips -->
+      <div class="app-card" style="margin-bottom:20px">
+        <div class="app-card-title">💻 Technical Interview Tips</div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+          <div class="resource-card" style="flex-direction:row;align-items:flex-start;gap:12px;padding:14px">
+            <span style="font-size:20px">🗣️</span>
+            <div><strong style="font-size:14px">Think out loud</strong><p style="font-size:13px;color:var(--secondary);margin-top:3px">Interviewers want to see your process. Narrate your reasoning even when you're unsure.</p></div>
+          </div>
+          <div class="resource-card" style="flex-direction:row;align-items:flex-start;gap:12px;padding:14px">
+            <span style="font-size:20px">❓</span>
+            <div><strong style="font-size:14px">Clarify before coding</strong><p style="font-size:13px;color:var(--secondary);margin-top:3px">Ask about edge cases, input formats, constraints. It shows engineering maturity.</p></div>
+          </div>
+          <div class="resource-card" style="flex-direction:row;align-items:flex-start;gap:12px;padding:14px">
+            <span style="font-size:20px">🐢</span>
+            <div><strong style="font-size:14px">Start with brute force</strong><p style="font-size:13px;color:var(--secondary);margin-top:3px">Get a working solution first, then optimise. A correct O(n²) beats a broken O(n log n).</p></div>
+          </div>
+          <div class="resource-card" style="flex-direction:row;align-items:flex-start;gap:12px;padding:14px">
+            <span style="font-size:20px">🧪</span>
+            <div><strong style="font-size:14px">Test your solution</strong><p style="font-size:13px;color:var(--secondary);margin-top:3px">Walk through examples, including edge cases, before declaring done. Shows diligence.</p></div>
+          </div>
+          <div class="resource-card" style="flex-direction:row;align-items:flex-start;gap:12px;padding:14px">
+            <span style="font-size:20px">📊</span>
+            <div><strong style="font-size:14px">Discuss complexity</strong><p style="font-size:13px;color:var(--secondary);margin-top:3px">Always state the time and space complexity of your solution. Shows CS fundamentals.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions to ask them -->
+      <div class="app-card">
+        <div class="app-card-title">🙋 Questions to Ask Your Interviewer</div>
+        <div class="app-card-sub">Asking good questions signals genuine interest and helps you evaluate the role.</div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+          ${[
+            'What does success look like in this role after the first 90 days?',
+            'What are the biggest technical challenges the team is facing right now?',
+            'How does the team approach code reviews, testing, and deployment?',
+            'What does the on-call / incident response process look like?',
+            'How are product decisions made — who has input from engineering?',
+            'What have the most successful people who\'ve been in this role had in common?',
+            'What does career growth look like for engineers at this company?',
+            'Is there anything in my background you\'d like me to clarify?',
+          ].map(q=>`<div style="padding:11px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;font-size:13.5px;color:var(--ink)">💬 ${q}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ SALARY INSIGHTS ════ -->
+    <div class="tab-panel" id="tab-salary">
+
+      <div style="margin-bottom:16px">
+        <h2 class="section-title" style="font-size:17px">Salary Insights</h2>
+        <p class="section-sub">Indicative salary ranges for common tech roles. Figures are approximate US market medians — actual compensation varies by company, location, and experience. Always research current data on Levels.fyi, Glassdoor, and LinkedIn Salary.</p>
+      </div>
+
+      <div class="app-card" style="margin-bottom:20px">
+        <div class="app-card-title">💵 Software Engineering Salaries (US, Base Salary)</div>
+        <div style="overflow-x:auto;margin-top:4px">
+        <table class="salary-table" id="sal-table"></table>
+        </div>
+      </div>
+
+      <div class="resource-grid">
+        <div class="resource-card">
+          <div class="rc-icon">📈</div>
+          <div class="rc-title">How to Negotiate</div>
+          <div class="rc-desc">• Always try to get a number from them first<br>• Anchor high — your first number sets the range<br>• Use competing offers or market data as leverage<br>• Negotiate the full package: equity, bonus, PTO, remote<br>• Get it in writing before accepting</div>
+          <div class="rc-tag green">Negotiation</div>
+        </div>
+        <div class="resource-card">
+          <div class="rc-icon">🌍</div>
+          <div class="rc-title">Remote Work Premium</div>
+          <div class="rc-desc">Remote roles can access higher-paying markets. A developer in a lower cost-of-living city with a San Francisco company salary can achieve significant purchasing power advantages.</div>
+          <div class="rc-tag blue">Remote Tip</div>
+        </div>
+        <div class="resource-card">
+          <div class="rc-icon">💎</div>
+          <div class="rc-title">Total Compensation</div>
+          <div class="rc-desc">At larger companies, base salary can be just 40–60% of total comp. Equity (RSUs/options), annual bonus, signing bonus, and benefits can equal or exceed base salary. Always evaluate the full package.</div>
+          <div class="rc-tag amber">Total Comp</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ JOB CHECKLIST ════ -->
+    <div class="tab-panel" id="tab-checklist">
+
+      <div style="margin-bottom:16px">
+        <h2 class="section-title" style="font-size:17px">Job Application Checklist</h2>
+        <p class="section-sub">Track your progress through the application process. Checks are saved in your browser.</p>
+      </div>
+
+      <div class="app-card">
+        <div class="app-card-title">📋 Before You Apply</div>
+        <div class="checklist" id="pre-apply-list"></div>
+      </div>
+
+      <div class="app-card" style="margin-top:18px">
+        <div class="app-card-title">📤 During the Application</div>
+        <div class="checklist" id="apply-list"></div>
+      </div>
+
+      <div class="app-card" style="margin-top:18px">
+        <div class="app-card-title">🎤 Interview Phase</div>
+        <div class="checklist" id="interview-list"></div>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px">
+        <button class="btn btn-outline btn-sm" id="reset-checklist">Reset All Checks</button>
+        <span style="font-size:13px;color:var(--secondary);align-self:center" id="check-progress"></span>
+      </div>
+    </div>
+
+  </div><!-- /app-content -->
+</main>
+
+<script src="shared.js"></script>
+<script>
+const user = Auth.requireAuth();
+if (!user) throw new Error('redirect');
+initSidebar();
+document.getElementById('logout-btn').addEventListener('click', () => { Auth.logout(); window.location.href='index.html'; });
+
+/* ── Tabs ── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── Tip accordions ── */
+function toggleTip(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+  const arrow = header.querySelector(':last-child');
+  if (arrow) arrow.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+/* ── Interview Q&A ── */
+const BEH_QS = [
+  { q:'Tell me about yourself.',
+    a:'Use the Present–Past–Future formula: what you do now, relevant background, and why you\'re excited about this specific role. Keep it to 90 seconds.' },
+  { q:'Tell me about a time you solved a difficult technical problem.',
+    a:'Structure: what was the system/problem? What was your specific contribution? What was the measurable outcome? Avoid "we did" — say "I" and "my".' },
+  { q:'Describe a situation where you disagreed with a colleague or manager.',
+    a:'Show you can handle conflict professionally. Focus on how you listened, communicated your view clearly, and reached a resolution. Outcome matters.' },
+  { q:'Tell me about a time you failed.',
+    a:'Choose something real but recoverable. Focus more on what you learned and changed than on the failure itself. Shows self-awareness.' },
+  { q:'Give an example of when you had to meet a tight deadline.',
+    a:'Demonstrate prioritisation, communication with stakeholders, and how you delivered. Include what you deprioritised and why.' },
+  { q:'Describe a project you\'re most proud of.',
+    a:'Pick something technically interesting or impactful. Cover the problem, your approach, challenges you overcame, and the outcome.' },
+  { q:'How do you handle ambiguous requirements?',
+    a:'Explain your process: asking clarifying questions, making documented assumptions, building incrementally, and validating early with stakeholders.' },
+  { q:'Tell me about a time you improved a process or system.',
+    a:'Quantify the improvement. Before/after metrics. Who benefited? Did it scale to the rest of the team?' },
+];
+
+const bContainer = document.getElementById('beh-questions');
+bContainer.innerHTML = BEH_QS.map((item,i) => `
+  <div class="qa-item" id="qa-${i}">
+    <div class="qa-q" onclick="toggleQA(${i})">
+      <span>${item.q}</span><span class="qa-arrow">▾</span>
+    </div>
+    <div class="qa-a">${item.a}</div>
+  </div>`).join('');
+
+function toggleQA(i) {
+  const el = document.getElementById('qa-'+i);
+  el.classList.toggle('open');
+}
+
+/* ── Salary data ── */
+const SAL_DATA = [
+  { role:'Junior / Entry-Level Engineer',  yoe:'0–2',  low:75,  mid:95,  high:120 },
+  { role:'Mid-Level Software Engineer',    yoe:'2–5',  low:110, mid:140, high:170 },
+  { role:'Senior Software Engineer',       yoe:'5–8',  low:150, mid:185, high:230 },
+  { role:'Staff Engineer',                 yoe:'8–12', low:195, mid:240, high:300 },
+  { role:'Principal / Distinguished Eng',  yoe:'12+',  low:240, mid:300, high:400 },
+  { role:'Engineering Manager',            yoe:'5–10', low:160, mid:205, high:260 },
+  { role:'Data Scientist',                 yoe:'2–6',  low:105, mid:135, high:175 },
+  { role:'ML Engineer',                    yoe:'3–7',  low:140, mid:175, high:230 },
+  { role:'DevOps / Cloud Engineer',        yoe:'2–6',  low:100, mid:130, high:170 },
+  { role:'Product Manager',                yoe:'3–8',  low:120, mid:155, high:200 },
+];
+
+const maxSal = 400;
+document.getElementById('sal-table').innerHTML = `
+  <thead><tr>
+    <th>Role</th><th>YOE</th><th>Low</th><th>Median</th><th>High</th><th style="min-width:150px">Range</th>
+  </tr></thead>
+  <tbody>
+    ${SAL_DATA.map(r=>`<tr>
+      <td style="font-weight:560">${r.role}</td>
+      <td style="color:var(--secondary)">${r.yoe} yrs</td>
+      <td>$${r.low}k</td>
+      <td style="font-weight:640;color:var(--amber-dark)">$${r.mid}k</td>
+      <td>$${r.high}k</td>
+      <td><div class="sal-bar-wrap">
+        <div style="width:${Math.round(r.low/maxSal*100)}%" class="sal-bar" style="opacity:.4"></div>
+        <div style="width:${Math.round((r.mid-r.low)/maxSal*100)}%;margin-left:2px;opacity:.7" class="sal-bar"></div>
+        <div style="width:${Math.round((r.high-r.mid)/maxSal*100)}%;margin-left:2px;opacity:1" class="sal-bar"></div>
+      </div></td>
+    </tr>`).join('')}
+  </tbody>`;
+
+/* ── Checklist ── */
+const CHECKLISTS = {
+  'pre-apply-list': [
+    'Run resume through ResumeLens analyzer for this specific role',
+    'Tailor the skills section to match job description keywords',
+    'Update professional summary to reflect the target role',
+    'Quantify at least 3 bullet points with numbers/metrics',
+    'Check for spelling and grammar errors',
+    'Confirm contact details and LinkedIn URL are current',
+    'Save resume as PDF with a professional filename',
+    'Research the company: product, mission, recent news',
+    'Find the hiring manager\'s name on LinkedIn if possible',
+  ],
+  'apply-list': [
+    'Customise cover letter opening to mention the specific company',
+    'Address cover letter to hiring manager by name',
+    'Submit all required documents in the specified format',
+    'Note the application date and job ID in a tracker',
+    'Connect with current employees on LinkedIn',
+    'Follow the company on LinkedIn',
+  ],
+  'interview-list': [
+    'Prepare 5 STAR stories covering different competencies',
+    'Research the team\'s tech stack and recent engineering blog posts',
+    'Practice your "Tell me about yourself" answer (90 sec)',
+    'Prepare 5 thoughtful questions to ask the interviewer',
+    'Do a mock technical interview on LeetCode or similar',
+    'Test video call setup: camera, mic, lighting, background',
+    'Send a thank-you email within 24 hours of each interview',
+    'Follow up if no response within 5 business days',
+  ],
+};
+
+const CKKEY = 'resumelens_checklist_' + user.id;
+
+function loadChecks() {
+  try { return JSON.parse(localStorage.getItem(CKKEY)) || {}; } catch { return {}; }
+}
+function saveChecks(data) { localStorage.setItem(CKKEY, JSON.stringify(data)); }
+
+function renderChecklist(listId, items) {
+  const saved = loadChecks();
+  const el = document.getElementById(listId);
+  el.innerHTML = items.map((item, i) => {
+    const key = listId + '-' + i;
+    const done = !!saved[key];
+    return `<label class="check-item ${done?'done':''}" id="ci-${key}">
+      <input type="checkbox" ${done?'checked':''} onchange="toggleCheck('${key}','${listId}',${i})">
+      <span>${item}</span>
+    </label>`;
+  }).join('');
+  updateProgress();
+}
+
+function toggleCheck(key, listId, idx) {
+  const saved = loadChecks();
+  const label = document.getElementById('ci-'+key);
+  if (label.querySelector('input').checked) {
+    saved[key] = true; label.classList.add('done');
+  } else {
+    delete saved[key]; label.classList.remove('done');
+  }
+  saveChecks(saved);
+  updateProgress();
+}
+
+function updateProgress() {
+  const saved = loadChecks();
+  const total = Object.values(CHECKLISTS).reduce((s,a)=>s+a.length,0);
+  const done  = Object.keys(saved).length;
+  document.getElementById('check-progress').textContent = `${done} / ${total} items completed`;
+}
+
+Object.entries(CHECKLISTS).forEach(([id, items]) => renderChecklist(id, items));
+
+document.getElementById('reset-checklist').addEventListener('click', () => {
+  localStorage.removeItem(CKKEY);
+  Object.entries(CHECKLISTS).forEach(([id,items]) => renderChecklist(id,items));
+  showToast('Checklist reset.', '', 2000);
+});
+</script>
+</body>
+</html>
